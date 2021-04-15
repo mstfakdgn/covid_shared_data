@@ -58,27 +58,66 @@ def prepare_datasets(test_size, validation_size):
 
     X = X[..., np.newaxis]
 
-    # create the train/test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    
-    # create train/validation split
-    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=validation_size)
+    positiveIndex = []
+    negativeIndex = []
+    for i, train in enumerate(y):
+        if train == 0:
+            positiveIndex.append(i)
+        if train == 1:
+            negativeIndex.append(i)
 
-    for i,case in enumerate(y):
-        if case == 1:
-            y_test[0] = 1
-            X_test[0] = X[i]
-            y_validation[0] = 1
-            X_validation[0] = X[i]
-            y_train[0] = 1
-            X_train[0] = X[i]
-        elif case == 0:
-            y_test[1] = 0
-            X_test[1] = X[i]
-            y_validation[1] = 0
-            X_validation[1] = X[i]
-            y_train[1] = 0
-            X_train[1] = X[i]
+    positiveCases = X[positiveIndex]
+    negativeCases = X[negativeIndex]
+
+    positiveLabels = y[positiveIndex]
+    negativeLabels = y[negativeIndex]
+
+    #test       
+    n = 3
+    index = np.random.choice(positiveCases.shape[0], n, replace=False)
+    X_test_positive = positiveCases[index]
+    y_test_positive = positiveLabels[index]
+
+    n = 146
+    index = np.random.choice(negativeCases.shape[0], n, replace=False)
+    X_test_negative = negativeCases[index]
+    y_test_negative = negativeLabels[index]
+
+
+    X_test = np.concatenate((X_test_positive, X_test_negative), axis=0)
+    y_test = np.concatenate((y_test_positive, y_test_negative), axis=0)
+
+
+    #validation
+    n = 2
+    index = np.random.choice(positiveCases.shape[0], n, replace=False)
+    X_validation_positive = positiveCases[index]
+    y_validation_positive = positiveLabels[index]
+
+    n = 117
+    index = np.random.choice(negativeCases.shape[0], n, replace=False)
+    X_validation_negative = negativeCases[index]
+    y_validation_negative = negativeLabels[index]
+
+
+    X_validation = np.concatenate((X_validation_positive, X_validation_negative), axis=0)
+    y_validation = np.concatenate((y_validation_positive, y_validation_negative), axis=0)
+
+
+    #train
+    n = 12
+    index = np.random.choice(positiveCases.shape[0], n, replace=False)
+    X_train_positive = positiveCases[index]
+    y_train_positive = positiveLabels[index]
+
+    n = 469
+    index = np.random.choice(negativeCases.shape[0], n, replace=False)
+    X_train_negative = negativeCases[index]
+    y_train_negative = negativeLabels[index]
+
+
+    X_train = np.concatenate((X_train_positive, X_train_negative), axis=0)
+    y_train = np.concatenate((y_train_positive, y_train_negative), axis=0)
 
     return X_train, X_validation, X_test, y_train, y_validation, y_test
 
